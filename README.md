@@ -1,10 +1,10 @@
 # Wrastor #
 
-The files contained in this repository constitute the beginnings of a Rivals of Aether. If you are interested in using
-this tool, please be warned: **THERE BE DRAGONS**. I wrote the first prototype of this code in a single sitting on
-July 4, 2017 (because if it weren't a federal holiday, I'd probably be at work). I chose the name Wrastor because,
-clearly, he is the most patriotic rival (which fit the release date well). I have plans to support and
-continue work on this code, but haven't gotten around to many of them yet - see the TODO section below.
+The files contained in this repository constitute the beginnings of a Rivals of Aether modding tool. If you are
+interested in using these scripts, please be warned: **THERE BE DRAGONS**. I wrote the first prototype of this code
+in a single sitting on July 4, 2017 (because if it weren't a federal holiday, I'd probably be at work). I chose the
+name Wrastor because, clearly, he is the most patriotic rival (which fit the release date well). I have plans to
+support and continue work on this code, but haven't gotten around to many of them yet - see the TODO section below.
 
 ## Usage ##
 

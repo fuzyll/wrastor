@@ -1,9 +1,24 @@
 #!/usr/bin/env ruby
 
+# get the old GameMaker archive's file size
+size = File.size?("data.win")
+
 # read in the new GameMaker archive
 archive = nil
 open("new.win", "rb") do |file|
     archive = file.read()
+end
+
+# abort if we're larger than the original
+# TODO: there's probably a way to make this work - I just haven't had time to figure out what's going on yet
+if archive.length() > size
+    abort "[!] Currently only support having less data than the original file size"
+end
+
+# pad the new archive out to the old length if we're smaller than the original
+# TODO: not sure why this appears to be necessary - need to take some time to look into it
+if archive.length() < size
+    archive += "\x00"*(size - archive.length())
 end
 
 # replace the one in the existing executable with our new one

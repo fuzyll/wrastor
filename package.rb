@@ -28,7 +28,8 @@ open("out/order.txt", "r") do |meta|
                 offsets += [size + 12 + 4*num + 8*i].pack("I<")       # add 12 + 4*num for header, 8*i for position
                 location = size + 12 + 4*num + 8*num + data.length()  # calculate the next available position
                 padding = 0x80 - location % 0x80                      # pad that position out to a 128-byte boundary
-                img = "\x00"*padding + img unless padding == 0x80     # add padding to the front of our image data
+                padding = 0 if padding == 0x80                        # catch edge-case of already being aligned
+                img = "\x00"*padding + img                            # add padding to the front of our image data
                 meta += "\x00\x00\x00\x00#{[location + padding].pack("I<")}"
 
                 # save the texture data

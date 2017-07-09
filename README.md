@@ -24,19 +24,24 @@ There are 5 steps I intend for a user to take when using the scripts located her
 4. Run `./pack.rb` to package up the contents of the `out` directory into `new.win`
 5. Run `./replace.rb` to replace the `data.win` in your executable with `new.win`
 
-The only pre-requisite should be having your copy of `RivalsofAether.exe` in the same folder as these scripts. I think.
+The only pre-requisite should be having your copy of `RivalsofAether.exe` in the same folder as these scripts.
 
 ## TODO ##
 
 This is a short list of stuff I need to do to make this thing more better:
 
-1. Test swapping textures out (which should be theoretically possible now, though still un-tested)
+1. Fix whatever bug is causing the patched executable to crash after modifying the embedded IFF blob
+    * I have verified that I can re-build `data.win` files from 4 different GameMaker games at this point. So, my
+      assumption is that failures are *not* due to the packing of the textures/audio files. My new theory is that I'm
+      not updating an absolute file offset that references textures and/or audio files, which the game can't resolve
+      correctly while loading the embedded IFF blob. Haven't yet tracked this down, though.
 2. Re-write the tool in a language other than Ruby
     * Ruby is a *fantastic* language, but this isn't one of its best use-cases. Maintaining this code is going to
       be kinda crappy and most users aren't going to want to install the entire Ruby toolchain just to get it working.
-3. Extract all the other data within the GameMaker archive so that people can edit that, too
-4. Make everything more user-friendly
-5. Document everything better
+    * My current plan is to re-write the tool in Rust. I've already done this with the extraction utility, which works.
+3. Extract all the other data within the GameMaker archive so that people can edit that stuff, too
+4. Make everything more user-friendly (probably with some sort of GUI so people afraid of terminals can use it)
+5. Document everything better (or, really, at all)
 6. ???
 7. PROFIT!
 
@@ -197,3 +202,11 @@ fuzyll@dagobah:~/Projects/wrastor$ md5sum *.exe
 bb045dc0e31f928ae786b6e16b7a21ee  RivalsofAether.exe
 bb045dc0e31f928ae786b6e16b7a21ee  RivalsofAether-patched.exe
 ```
+
+While I haven't included terminal output proof here, I can also state that the `data.win` files for Undertale and
+Wuppo also re-build properly. These games don't require extraction/replacement, though, because they ship with the
+file separated from the executable (unlike Rivals of Aether).
+
+I have additionally tested the new Rust version of the extraction utility against `HyperLightDrifter.exe`. The
+unpack and pack process currently fails, however, because I make a bad assumption about a specific texture type
+value. This is noted in code comments and can be changed manually for now if anyone wants.

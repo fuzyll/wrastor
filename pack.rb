@@ -41,27 +41,36 @@ open("out/order.txt", "r") do |meta|
             num = filenames.length()
             puts "[+] Found #{num} textures to create the TXTR chunk with..."
 
+            # read all files into memory
+            files = []
             filenames.each_with_index() do |filename, i|
-                # read in input file
-                img = nil
                 open(filename, "rb") do |file|
-                    img = file.read()
+                    files << file.read()
                 end
-
-                # add information to the TXTR header
-                offsets += [size + 12 + 4*num + 8*i].pack("I<")       # add 12 + 4*num for header, 8*i for position
-                location = size + 12 + 4*num + 8*num + data.length()  # calculate the next available position
-                padding = 0x80 - location % 0x80                      # pad that position out to a 128-byte boundary
-                padding = 0 if padding == 0x80                        # catch edge-case of already being aligned
-                img = "\x00"*padding + img                            # add padding to the front of our image data
-                meta += "\x00\x00\x00\x00#{[location + padding].pack("I<")}"
-
-                # save the texture data
-                data += img
             end
 
+            # prepare the TXTR header
+            num.times do |i|
+                offsets += [size + 12 + 4*num + 8*i].pack("I<")     # add 12 + 4*num for offsets, 8*i for meta position
+            end
+            start = size + 12 + 4*num + 8*num                       # calculate the next available data position
+            padding = 0x80 - start % 0x80                           # pad that position out to a 128-byte boundary
+            padding = 0 if padding == 0x80                          # handle edge-case of already being aligned
+            start += padding                                        # add padding
+            num.times do |i|
+                # FIXME: we assume the "type" here is 0, which is wrong for games like Hyper Light Drifter
+                meta += "\x00\x00\x00\x00#{[start].pack("I<")}"
+                data += files[i]
+                pad = 0x80 - files[i].length() % 0x80               # pad the file out to a 128-byte boundary
+                pad = 0 if pad == 0x80 or i == num-1                # handle edge-case of already being aligned
+                data += "\x00"*pad                                  # add padding
+                start += files[i].length() + pad                    # advance data position
+            end
+            meta += "\x00"*padding
+
             chunk_size = 4 + offsets.length() + meta.length() + data.length()
-            chunk_padding = 8 - ((archive.length() + 8 + chunk_size) % 8)
+            chunk_padding = 4 - ((archive.length() + 8 + chunk_size) % 4)
+            chunk_padding = 0 if chunk_padding == 4
             archive += "#{name}#{[chunk_size + chunk_padding].pack("I<")}#{[num].pack("I<")}#{offsets}#{meta}#{data}"
             archive += "\x00"*chunk_padding
 
@@ -75,23 +84,25 @@ open("out/order.txt", "r") do |meta|
             Dir.chdir("out/AUDO")
             filenames = Dir.glob("[0-9]*.{wav,ogg}").sort_by { |s| s.gsub(".*","").to_i }
             num = filenames.length()
-            puts "[+] Found #{num} textures to create the AUDO chunk with..."
+            puts "[+] Found #{num} audio files to create the AUDO chunk with..."
 
+            # read all files into memory
+            files = []
             filenames.each_with_index() do |filename, i|
-                # read in input file
-                wav = nil
                 open(filename, "rb") do |file|
-                    wav = file.read()
+                    files << file.read()
                 end
+            end
 
-                # add information to the AUDO header
-                location = size + 12 + 4*num + data.length()
-                padding = 4 - location % 4
-                padding = 0 if padding == 4  # handle edge-case of already being aligned properly
-                offsets += [location + padding].pack("I<")
-
-                # save the audio data
-                data += "\x00"*padding + "#{[wav.length()].pack("I<")}" + wav
+            # prepare the AUDO header
+            start = size + 12 + 4*num
+            num.times do |i|
+                offsets += [start].pack("I<")
+                data += "#{[files[i].length()].pack("I<")}" + files[i]
+                pad = 4 - files[i].length() % 4                     # pad the file out to a 128-byte boundary
+                pad = 0 if pad == 4 or i == num-1                # handle edge-case of already being aligned
+                data += "\x00"*pad                                  # add padding
+                start += 4 + files[i].length() + pad
             end
 
             chunk_size = 4 + offsets.length() + data.length()

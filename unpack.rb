@@ -91,7 +91,7 @@ chunk.each do |name,entry|
                                                             # the input always has 0x826042AE after "IEND"
 
             # write the texture to disk
-            # FIXME: we assume here that all textures are type 0 (PNG), which may not always be the case
+            # FIXME: we assume that all textures are type 0, which is wrong for games like Hyper Light Drifter
             open("out/TXTR/#{i}.png", "wb") do |file|
                 file.write(data[start..start+finish-1])
             end

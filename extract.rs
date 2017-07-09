@@ -40,12 +40,15 @@ fn main() {
     let mut idx = 0;
     let mut len = 0;
     for (i, _) in data.iter().enumerate() {
-        // find next possible signature
-        if &data[i..i+4] != &[0x46, 0x4F, 0x52, 0x4D] {
+        // find next possible IFF signature: "FORM" + 4-byte, little-endian length counter
+        if &data[i..i+4] != &['F' as u8, 'O' as u8, 'R' as u8, 'M' as u8] {
+            continue;
+        }
+        if &data[i..i+6] == &['F' as u8, 'O' as u8, 'R' as u8, 'M' as u8, 'A' as u8, 'T' as u8] {
             continue;
         }
 
-        // check the length (4 bytes after "FORM", value is little-endian) to see if it looks valid
+        // check the length to see if it looks valid before selecting this offset
         len = ((data[i+7] as usize) << 24) + ((data[i+6] as usize) << 16) + ((data[i+5] as usize) << 8) + (data[i+4] as usize);
         if len < data.len() && len > 0x100000 {  // FIXME: minimum size of 0x100000 here was chosen arbitrarily
             idx = i;

@@ -10,19 +10,18 @@ support and continue work on this code, but haven't gotten around to many of the
 
 This tool is *currently* written in [Ruby](https://www.ruby-lang.org/en/downloads/). It's been tested on:
 
+* Windows 10 (thanks, Menace13!)
 * Bash on Ubuntu on Windows 10
 * MacOS 10.12.5
 * Ubuntu 16.04
 
-It has *not* been tested on Windows proper. It probably works? But, it might not.
-
 There are 5 steps I intend for a user to take when using the scripts located here:
 
-1. Run `./carve.rb` to carve the `data.win` file (the GameMaker archive) out of `RivalsofAether.exe`
-2. Run `./extract.rb` to extract the contents of `data.win` to the `out` directory
+1. Run `./extract.rb` to extract the `data.win` file (the GameMaker archive) out of `RivalsofAether.exe`
+2. Run `./unpack.rb` to unpack the contents of `data.win` to the `out` directory
 3. Edit any of the texture/audio files you find in the `out/TXTR` or `out/AUDO` folders however you'd like
     * **NOTE:** You MUST keep the same filename and filetype! I don't (yet) support other shenanigans.
-4. Run `./package.rb` to package up the contents of the `out` directory into `new.win`
+4. Run `./pack.rb` to package up the contents of the `out` directory into `new.win`
 5. Run `./replace.rb` to replace the `data.win` in your executable with `new.win`
 
 The only pre-requisite should be having your copy of `RivalsofAether.exe` in the same folder as these scripts. I think.
